@@ -5,10 +5,12 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class LoginPage(BasePage):
     login_link = (By.XPATH, "//a[contains(@href, '/account/login')] | //a[text()='Login'] | //span[text()='Login']")
-    # Using multiple common patterns for the login input
-    email_input = (By.XPATH, "//input[@type='text' and (contains(@placeholder, 'Email') or contains(@placeholder, 'Mobile') or contains(@class, '_2IX_2-') or contains(@class, 'VJZDxU'))]")
-    continue_btn = (By.XPATH, "//button[@type='submit'] | //span[text()='CONTINUE']/parent::button | //button[.//span[text()='Request OTP']]")
-    otp_login_btn = (By.XPATH, "//button[@type='submit'] | //span[text()='Login']/parent::button | //button[.//span[text()='Verify']]")
+    # Updated locators based on the current HTML structure (class yXUQVt and c3Bd2c) or any text input not named 'q' (search)
+    email_input = (By.XPATH, "//input[contains(@class, 'yXUQVt') or contains(@class, 'c3Bd2c') or (@type='text' and not(@name='q'))]")
+    # Updated Request OTP button locator
+    continue_btn = (By.XPATH, "//button[text()='Request OTP' or contains(., 'Request OTP')]")
+    # Updated Verify/Login button locator (just use the submit button)
+    otp_login_btn = (By.XPATH, "//button[@type='submit'] | //button[contains(., 'Verify') or contains(., 'Login')]")
 
     def click_login(self):
         wait = WebDriverWait(self.driver, 10)
@@ -34,21 +36,37 @@ class LoginPage(BasePage):
             return False
 
     def enter_email(self, email):
-        email_field = WebDriverWait(self.driver, 10).until(
+        wait = WebDriverWait(self.driver, 15)
+        email_field = wait.until(
             EC.visibility_of_element_located(self.email_input)
         )
+        # Small delay to ensure stability
+        import time
+        time.sleep(2)
+
+        # Click and clear
+        email_field.click()
         email_field.clear()
+
+        # Send keys character by character for reliability or directly
         email_field.send_keys(email)
 
     def click_continue(self):
-        btn = WebDriverWait(self.driver, 10).until(
+        wait = WebDriverWait(self.driver, 15)
+        btn = wait.until(
             EC.element_to_be_clickable(self.continue_btn)
         )
-        btn.click()
+        import time
+        time.sleep(1)
+        self.driver.execute_script("arguments[0].click();", btn)
 
     def click_login_after_otp(self):
-        """Clicks the final Login/Verify button after OTP is entered."""
-        btn = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(self.otp_login_btn)
-        )
-        btn.click()
+        """Clicks the final Login/Verify button after OTP is entered. Ignores timeout if auto-submitted."""
+        try:
+            btn = WebDriverWait(self.driver, 5).until(
+                EC.element_to_be_clickable(self.otp_login_btn)
+            )
+            btn.click()
+        except:
+            # Form likely auto-submitted or button is hidden/different
+            pass

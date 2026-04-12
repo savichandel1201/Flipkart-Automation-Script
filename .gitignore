@@ -1,0 +1,9 @@
+.idea/workspace.xml
+workspace.xml
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+reports/
+logs/

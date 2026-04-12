@@ -1,10 +1,15 @@
 import pytest
 import time
+import os
+from dotenv import load_dotenv
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from page.home_page import HomePage
 from page.login_page import LoginPage
 from utilities.logger import setup_logger
+
+# Load environment variables
+load_dotenv()
 
 logger = setup_logger()
 
@@ -14,6 +19,12 @@ class TestLogin:
     def test_login_with_manual_otp(self, setup):
         driver = setup
         logger.info("Starting Login Test")
+        
+        # Get credential from .env
+        login_credential = os.getenv("LOGIN_CREDENTIAL")
+        if not login_credential:
+             logger.error("LOGIN_CREDENTIAL not found in .env file")
+             pytest.fail("LOGIN_CREDENTIAL not found in .env file")
 
         # Perform Login
         lp = LoginPage(driver)
@@ -25,8 +36,11 @@ class TestLogin:
              logger.info("Clicking on Login link")
              lp.click_login()
 
-        lp.enter_email("savichandel12@gmail.com")
-        logger.info("Entered Email")
+        lp.enter_email(login_credential)
+        logger.info(f"Entered Login Credential: {login_credential}")
+        
+        # Debug screenshot
+        driver.save_screenshot("screenshots/after_email_entry.png")
 
         lp.click_continue()
         logger.info("Clicked Continue / Request OTP")
