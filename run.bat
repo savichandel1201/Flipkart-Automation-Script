@@ -1,3 +1,6 @@
+@echo off
 cd /d %~dp0
-pytest
+echo Starting Flipkart Automation...
+call .venv\Scripts\activate
+pytest -s
 pause
