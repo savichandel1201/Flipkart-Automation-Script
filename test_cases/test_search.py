@@ -7,6 +7,7 @@ from utilities.screenshot import capture_screenshot
 
 logger = setup_logger()
 
+@pytest.mark.sanity
 @pytest.mark.parametrize("data", ReadTestData.get_search_data())
 class TestSearch:
 

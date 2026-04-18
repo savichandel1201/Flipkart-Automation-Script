@@ -7,3 +7,5 @@ __pycache__/
 .venv/
 reports/
 logs/
+/chrome_profile/
+/screenshots/
